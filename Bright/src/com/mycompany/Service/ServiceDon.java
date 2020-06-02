@@ -6,12 +6,18 @@
 package com.mycompany.Service;
 
 
+import com.codename1.io.CharArrayReader;
 import com.codename1.io.ConnectionRequest;
+import com.codename1.io.JSONParser;
 import com.codename1.io.NetworkEvent;
 import com.codename1.io.NetworkManager;
+import com.codename1.ui.events.ActionListener;
 import com.mycompany.Entities.don;
 import com.mycompany.Entities.stock;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,6 +26,9 @@ import org.json.JSONObject;
  * @author HP
  */
 public class ServiceDon {
+ ArrayList<don> listDon = new ArrayList<>();
+ ArrayList<stock> stock = new ArrayList<>();
+
 public void ajouter(don d) {
         ConnectionRequest con = new ConnectionRequest();
         String Url = "http://localhost/PI2/web/app_dev.php/stock/add"
@@ -37,41 +46,43 @@ public void ajouter(don d) {
         NetworkManager.getInstance().addToQueueAndWait(con);// Ajout de notre demande de connexion à la file d'attente du NetworkManager
     }
 public ArrayList<don> parseListdonJson(String json) {
-        System.out.println("DEBUG, 48, parseListClubJSON:" + json);
-        ArrayList<don> listDon = new ArrayList<>();
-       JSONArray jsonArray = new JSONArray(json);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            listDon.add(jsonTodon(jsonArray.getJSONObject(i)));
-        }
-         System.out.println(listDon);
-        return listDon;
+      try {
+            JSONParser j = new JSONParser();
+            Map<String,Object> tasksListJson = j.parseJSON(new CharArrayReader(json.toCharArray()));
+            
+            List<Map<String,Object>> list = (List<Map<String,Object>>)tasksListJson.get("root");
+            for(Map<String,Object> obj : list){
+             
+                don t = new don();
+                float reference = Float.parseFloat(obj.get("reference").toString());
+                t.setReference((int)reference);
+                t.setLibelle(obj.get("libelle").toString());
+                float quantite = Float.parseFloat(obj.get("quantite").toString());
+                t.setQuantite((int)quantite);
+                t.setSto(obj.get("type").toString());
 
+                listDon.add(t);
+            }
+            
+        } catch (IOException ex) {
+        }
+        return listDon;
     }
-ArrayList<don> listDon = new ArrayList<>();
 public ArrayList<don> getList2(){       
         ConnectionRequest con = new ConnectionRequest();
         con.setUrl("http://localhost/PI2/web/app_dev.php/stock/tasks/alld");  
         con.setPost(false);
-        con.addResponseListener((NetworkEvent evt) -> {
-            System.out.println(con.getResponseData());
-            listDon = this.parseListdonJson(new String(con.getResponseData()));
+       con.addResponseListener(new ActionListener<NetworkEvent>() {
+            @Override
+            public void actionPerformed(NetworkEvent evt) {
+                listDon = parseListdonJson(new String(con.getResponseData()));
+                con.removeResponseListener(this);
+            }
         });
-      
-    
-    
         NetworkManager.getInstance().addToQueueAndWait(con);
         return listDon;
     }
-public static void main(String[] args) {
-        (new ServiceDon()).getList2();
-    }
-private don jsonTodon(JSONObject jsonObject) {
-        Integer reference = jsonObject.getInt("reference");
-        String libelle = jsonObject.getString("libelle");
-        Integer quantite =jsonObject.getInt("quantite");
-        String type = jsonObject.getString("type");
-       return  new don(reference,libelle,quantite,type);
-    }
+
 public void Supprimer(int reference) {
         ConnectionRequest con = new ConnectionRequest();
         con.setUrl("http://localhost/PI2/web/app_dev.php/stock/"+reference+"/deleted");
@@ -83,7 +94,6 @@ public void Supprimer(int reference) {
         NetworkManager.getInstance().addToQueueAndWait(con);
 
     }
-ArrayList<stock> stock = new ArrayList<>();
 public void modifierdon(don es , int id) {
         ConnectionRequest con = new ConnectionRequest();// création d'une nouvelle demande de connexion
         String Url = "http://localhost/PI2/web/app_dev.php/stock/modifierRefg/"+id+"?quantite="+es.getQuantite();// création de l'URL
