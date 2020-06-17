@@ -18,8 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 /**
  *
@@ -37,13 +36,13 @@ public void ajouter(don d) {
                 + "&Stock_id=" + d.getStock_id()
                  ;
         System.out.println("L'URL est : : :" + Url);
-        con.setUrl(Url);// Insertion de l'URL de notre demande de connexion
+        con.setUrl(Url);
         con.addResponseListener((e) -> {
-        String str = new String(con.getResponseData());//Récupération de la réponse du serveur
-         System.out.println(str);//Affichage de la réponse serveur sur la console
+        String str = new String(con.getResponseData());
+         System.out.println(str);
 
         });
-        NetworkManager.getInstance().addToQueueAndWait(con);// Ajout de notre demande de connexion à la file d'attente du NetworkManager
+        NetworkManager.getInstance().addToQueueAndWait(con);
     }
 public ArrayList<don> parseListdonJson(String json) {
       try {
@@ -95,16 +94,16 @@ public void Supprimer(int reference) {
 
     }
 public void modifierdon(don es , int id) {
-        ConnectionRequest con = new ConnectionRequest();// création d'une nouvelle demande de connexion
-        String Url = "http://localhost/PI2/web/app_dev.php/stock/modifierRefg/"+id+"?quantite="+es.getQuantite();// création de l'URL
-        con.setUrl(Url);// Insertion de l'URL de notre demande de connexion
+        ConnectionRequest con = new ConnectionRequest();
+        String Url = "http://localhost/PI2/web/app_dev.php/stock/modifierRefg/"+id+"?quantite="+es.getQuantite();
+        con.setUrl(Url);
 
         con.addResponseListener((e) -> {
-            String str = new String(con.getResponseData());//Récupération de la réponse du serveur
-            System.out.println(str);//Affichage de la réponse serveur sur la console
+            String str = new String(con.getResponseData());
+            System.out.println(str);
 
         });
-        NetworkManager.getInstance().addToQueueAndWait(con);// Ajout de notre demande de connexion à la file d'attente du NetworkManager
+        NetworkManager.getInstance().addToQueueAndWait(con);
     }
    
             

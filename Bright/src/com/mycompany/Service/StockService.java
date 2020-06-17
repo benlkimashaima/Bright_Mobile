@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  *
- * @author HP
+ * @author bagra 
  */
 public class StockService {
   ArrayList<stock> listStocks = new ArrayList<>();
@@ -31,18 +31,19 @@ public class StockService {
                 +"?type=" + ev.getType()
                  ;
         System.out.println("L'URL est : : :" + Url);
-        con.setUrl(Url);// Insertion de l'URL de notre demande de connexion
+        con.setUrl(Url);
         con.addResponseListener((e) -> {
-        String str = new String(con.getResponseData());//Récupération de la réponse du serveur
-        System.out.println(str);//Affichage de la réponse serveur sur la console
+        String str = new String(con.getResponseData());
+        //System.out.println(str);
 
         });
-        NetworkManager.getInstance().addToQueueAndWait(con);// Ajout de notre demande de connexion à la file d'attente du NetworkManager
+        NetworkManager.getInstance().addToQueueAndWait(con);
     }
   public ArrayList<stock> parseListStockJson(String json) {
         try {
             listStocks=new ArrayList<>();
             JSONParser j = new JSONParser();
+           
             Map<String,Object> tasksListJson = j.parseJSON(new CharArrayReader(json.toCharArray()));
             
             List<Map<String,Object>> list = (List<Map<String,Object>>)tasksListJson.get("root");
@@ -74,16 +75,16 @@ public class StockService {
         return listStocks;
     }
  public void modifierStock(stock es) {
-        ConnectionRequest con = new ConnectionRequest();// création d'une nouvelle demande de connexion
-        String Url = "http://localhost/PI2/web/app_dev.php/stock/updateComM/"+es.getId()+"?type="+es.getType();// création de l'URL
-        con.setUrl(Url);// Insertion de l'URL de notre demande de connexion
+        ConnectionRequest con = new ConnectionRequest();
+        String Url = "http://localhost/PI2/web/app_dev.php/stock/updateComM/"+es.getId()+"?type="+es.getType();
+        con.setUrl(Url);
 
         con.addResponseListener((e) -> {
-            String str = new String(con.getResponseData());//Récupération de la réponse du serveur
-            System.out.println(str);//Affichage de la réponse serveur sur la console
+            String str = new String(con.getResponseData());
+            System.out.println(str);
 
         });
-        NetworkManager.getInstance().addToQueueAndWait(con);// Ajout de notre demande de connexion à la file d'attente du NetworkManager
+        NetworkManager.getInstance().addToQueueAndWait(con);
     }
   public void Supprimer(int id) {
         ConnectionRequest con = new ConnectionRequest();

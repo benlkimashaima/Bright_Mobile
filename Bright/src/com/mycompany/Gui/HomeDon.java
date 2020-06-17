@@ -92,7 +92,6 @@ public class HomeDon extends BaseForm{
      PDF = new Button("PDF  des Dons et des Stocks");
 
       Picker date = new Picker();
-      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
  
       add(libelle);
        add(quantite);
